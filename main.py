@@ -11,21 +11,21 @@ url = (
     "apiKey=8f1ee43151d34f569522c7940c191e47&language=en"
 )
 
+# Make the API request
+response = requests.get(url)
+content = response.json()
 
-# Make request
-request = requests.get(url)
+# Start building the email content with one Subject header
+body = "Subject: Today's News\n\n"
 
-# Get a dictionary with data
-content = request.json()
+# Loop through the top 20 articles
+for article in content.get("articles", [])[:20]:
+    title = article.get("title") or "No Title"
+    description = article.get("description") or "No Description"
+    url = article.get("url") or "No URL Provided"
 
-# Access the article titles and description
-body = ""
-for article in content["articles"][:20]:
-    if article["title"] is not None:
-        body = "Subject: Today's news" 
-        + "\n" + body + article["title"] + "\n" \
-        + str(article["description"]) + 2*"\n" \
-        + article["url"] + 2*"\n"
+    body += f"{title}\n{description}\n{url}\n\n"
 
+# Send the email (as a string)
 body = body.encode("utf-8")
 send_email(message=body)
